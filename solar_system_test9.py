@@ -424,7 +424,7 @@ planet_list = init_planets(filename)
 ''' Animation '''
 
 print('Begin animation')
-dt = 1000
+dt = 10
 i = 0  # Counter for moving the belts
 
 while True:
