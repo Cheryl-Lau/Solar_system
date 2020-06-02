@@ -74,11 +74,10 @@ class Planet:
         if self.name == 'Jupiter' and show_trojan_belt == True and self.first_iter == True:
             print('Generating Trojan belts')
             # Use position (in cartesian coord) to find theta on xz-plane 
-            if self.position.z >= 0:
-                self.init_j_theta = np.arctan(self.position.x/self.position.z)  
-            elif self.position.z < 0: # if denominator is negative (in Quadrant2/3), add 180deg 
-                self.init_j_theta = np.pi + np.arctan(self.position.x/self.position.z)
-
+            self.init_j_theta = np.arctan(self.position.x/self.position.z)
+            if self.position.z < 0:  # if denominator is negative (in Quadrant2/3), add 180deg 
+                self.init_j_theta += np.pi
+                    
             self.tro_rock_list, self.tro_theta0_list, self.tro_radius_list = init_trojan_belt(self.init_j_theta)
             
             
@@ -126,10 +125,9 @@ class Planet:
             for tro_rock,radius,theta0 in zip(self.tro_rock_list, self.tro_radius_list, self.tro_theta0_list):
                 
                 # Change in theta, from original position to updated self.position 
-                if self.position.z >= 0:
-                    updated_theta = np.arctan(self.position.x/self.position.z)
-                elif self.position.z < 0:
-                    updated_theta = np.pi + np.arctan(self.position.x/self.position.z)
+                updated_theta = np.arctan(self.position.x/self.position.z)
+                if self.position.z < 0: 
+                    updated_theta += np.pi
                 j_del_theta = updated_theta - self.init_j_theta
                 
                 # new theta = starting angle of rock relative to original theta + jupiter's moved theta
@@ -351,7 +349,7 @@ star_size = 1e10
 star_radius = 1e13  # distance from (0,0,0)
 
 # Arrows showing planets/moons' current position and velocity
-show_arrows = False
+show_arrows = True
 
 # Belt controls 
 show_trojan_belt = True
@@ -386,9 +384,9 @@ scene = vp.canvas(title='Solar system',width=1300,height=600,center=vp.vector(0,
 scene.autoscale = False
 scene.range = star_radius*model_scale
 
-scene.camera.pos = vp.vector(0,100000,star_radius*model_scale)  # nice view
+#scene.camera.pos = vp.vector(0,100000,star_radius*model_scale)  # nice view
 #scene.camera.pos = vp.vector(100000,0,0)  # side view
-#scene.camera.pos = vp.vector(0,100000,0)  # top down view
+scene.camera.pos = vp.vector(0,100000,0)  # top down view
 scene.camera.axis = vp.vector(vp.vector(0,0,0) - scene.camera.pos)
 
 # Sun (at fixed position)
