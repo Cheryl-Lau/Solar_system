@@ -336,9 +336,9 @@ def main():
     scene.autoscale = False
     scene.range = star_radius*model_scale
     
-    #scene.camera.pos = vp.vector(0,100000,star_radius*model_scale)  # nice view
+    scene.camera.pos = vp.vector(0,100000,star_radius*model_scale)  # nice view
     #scene.camera.pos = vp.vector(100000,0,0)  # side view
-    scene.camera.pos = vp.vector(0,100000,0)  # top down view
+    #scene.camera.pos = vp.vector(0,100000,0)  # top down view
     scene.camera.axis = vp.vector(vp.vector(0,0,0) - scene.camera.pos)
     
     # Background stars 
