@@ -52,7 +52,7 @@ class OrbitingBody:
                                 make_trail=trail,trail_radius=trail_size*model_scale)
         # Draw name label above sphere if this is a planet or sun 
         if self.is_moon == False: 
-            self.label = vp.text(pos=model_scale*vp.vector(self.position.x,self.position.y+5e9*model_scale,self.position.z),
+            self.label = vp.text(pos=model_scale*vp.vector(self.position.x,self.position.y+1e10*model_scale,self.position.z),
                                  align='center',text=self.name,height=5e10*model_scale,color=vp.color.green)  
             
             
