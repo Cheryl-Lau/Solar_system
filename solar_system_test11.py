@@ -285,7 +285,7 @@ def init_system(filename):
                                     name = 'Moon'+str(i),
                                     radius = moon_diameter_list[i]/2.,
                                     mass = 1.,   # physically unimportant info, just to keep class attr consistent
-                                    m_distance = moon_distance_list[i],  # PROBLEM HERE； nan 
+                                    m_distance = moon_distance_list[i],  
                                     color = 'white')
                 
                 object_list.append(moon)
