@@ -11,12 +11,12 @@ class OrbitingBody:
     '''
     Orbital motion of a body relative to a given central body 
     '''
-    def __init__(self, centr_body, **kwargs):
+    def __init__(self, centr_body, name, radius, mass, color, **kwargs):
         
-        self.name = kwargs.pop('name')
-        self.radius = kwargs.pop('radius')*1e3  # km to m
-        self.mass = kwargs.pop('mass')*1e24  # kg
-        self.color = getattr(vp.color,kwargs.pop('color'))
+        self.name = name
+        self.radius = radius*1e3  # km to m
+        self.mass = mass*1e24  # kg
+        self.color = getattr(vp.color,color)
         self.centr_body = centr_body   # passed in as an object 
         
         self.is_moon = False  # marks whether this is a planet/sun or a moon
@@ -66,6 +66,9 @@ class OrbitingBody:
                     
             self.tro_rock_list, self.tro_theta0_list, self.tro_radius_list = init_trojan_belt(self.init_j_theta)
             
+        if show_arrows == True:
+            self.arrow = vp.arrow(pos=model_scale*self.position,axis=self.velocity,length=1e11*model_scale,color=vp.color.red)
+            
         
     def motion(self, dt, i):
         '''
@@ -96,6 +99,9 @@ class OrbitingBody:
                 theta = theta0 + j_del_theta  
                 tro_rock.pos = model_scale*vp.vector(radius*vp.sin(theta),0,radius*vp.cos(theta))
                 
+        if show_arrows == True:
+            self.arrow.pos = model_scale*self.position
+            self.arrow.axis = self.velocity 
             
         # Print planet's updated position     
         if i%int(print_step) == 0 and self.is_moon == False:
@@ -241,14 +247,14 @@ def init_system(filename):
     
     # Initilize sun 
     sun = OrbitingBody(origin,
-                       name = data.iloc[sun_index][data.columns.get_loc('name')],
-                       radius = data.iloc[sun_index][data.columns.get_loc('radius')],  
-                       mass = data.iloc[sun_index][data.columns.get_loc('mass')],
+                       data.iloc[sun_index][data.columns.get_loc('name')],
+                       data.iloc[sun_index][data.columns.get_loc('radius')],  
+                       data.iloc[sun_index][data.columns.get_loc('mass')],
+                       data.iloc[sun_index][data.columns.get_loc('color')],
                        perih_distance = data.iloc[sun_index][data.columns.get_loc('perih_distance')],  
                        long_perih = data.iloc[sun_index][data.columns.get_loc('long_perih')],  
                        long_asc_node = data.iloc[sun_index][data.columns.get_loc('long_asc_node')],  
-                       inclination = data.iloc[sun_index][data.columns.get_loc('inclination')],  
-                       color = data.iloc[sun_index][data.columns.get_loc('color')])
+                       inclination = data.iloc[sun_index][data.columns.get_loc('inclination')])
     
     object_list.append(sun)
     
@@ -262,14 +268,14 @@ def init_system(filename):
         
         # Initialize planet 
         planet = OrbitingBody(sun,
-                              name = data.iloc[planet_index][data.columns.get_loc('name')], 
-                              radius = data.iloc[planet_index][data.columns.get_loc('radius')],  
-                              mass = data.iloc[planet_index][data.columns.get_loc('mass')],  
+                              data.iloc[planet_index][data.columns.get_loc('name')], 
+                              data.iloc[planet_index][data.columns.get_loc('radius')],  
+                              data.iloc[planet_index][data.columns.get_loc('mass')],  
+                              color = data.iloc[planet_index][data.columns.get_loc('color')],
                               perih_distance = data.iloc[planet_index][data.columns.get_loc('perih_distance')],  
                               long_perih = data.iloc[planet_index][data.columns.get_loc('long_perih')],  
                               long_asc_node = data.iloc[planet_index][data.columns.get_loc('long_asc_node')],  
-                              inclination = data.iloc[planet_index][data.columns.get_loc('inclination')],  
-                              color = data.iloc[planet_index][data.columns.get_loc('color')])
+                              inclination = data.iloc[planet_index][data.columns.get_loc('inclination')])
         
         object_list.append(planet)
                 
@@ -282,11 +288,11 @@ def init_system(filename):
 
                 # Initialize moon
                 moon = OrbitingBody(planet,
-                                    name = 'Moon'+str(i),
-                                    radius = moon_diameter_list[i]/2.,
-                                    mass = 1.,   # physically unimportant info, just to keep class attr consistent
-                                    m_distance = moon_distance_list[i],  
-                                    color = 'white')
+                                    'Moon'+str(i),  # name 
+                                    moon_diameter_list[i]/2.,  # radius
+                                    1.,   # mass; physically unimportant info, just to keep class attr consistent
+                                    color = 'white',
+                                    m_distance = moon_distance_list[i])
                 
                 object_list.append(moon)
                 
@@ -337,8 +343,8 @@ def main():
     scene.range = star_radius*model_scale
     
     scene.camera.pos = vp.vector(0,100000,star_radius*model_scale)  # nice view
-    #scene.camera.pos = vp.vector(100000,0,0)  # side view
-    #scene.camera.pos = vp.vector(0,100000,0)  # top down view
+#    scene.camera.pos = vp.vector(100000,0,0)  # side view
+#    scene.camera.pos = vp.vector(0,100000,0)  # top down view
     scene.camera.axis = vp.vector(vp.vector(0,0,0) - scene.camera.pos)
     
     # Background stars 
@@ -399,6 +405,8 @@ G = 6.67408e-11
 
 # planet trail
 trail_size = 1e9
+# arrows showing object velocity
+show_arrows = False
 # print planet locations every __ iterations 
 print_step = 10000
 
